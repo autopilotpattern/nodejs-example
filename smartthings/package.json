@@ -1,0 +1,11 @@
+{
+  "name": "smartthings-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "author": "",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "seneca": "3.x.x"
+  }
+}

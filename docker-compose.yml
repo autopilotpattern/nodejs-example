@@ -1,0 +1,103 @@
+consul:
+  image: autopilotpattern/consul:latest
+  restart: always
+  dns:
+    - 127.0.0.1
+  labels:
+    - triton.cns.services=consul
+  ports:
+    - "8500:8500"
+  command: >
+    /usr/local/bin/containerpilot
+    /bin/consul agent -server
+      -config-dir=/etc/consul
+      -bootstrap-expect 1
+      -ui-dir /ui
+prometheus:
+    image: autopilotpattern/prometheus
+    mem_limit: 128m
+    restart: always
+    ports:
+      - "9090:9090"
+    expose:
+      - 9090
+    links:
+      - consul:consul
+    environment:
+      - CONSUL=consul
+influx:
+  image: tutum/influxdb:latest
+  ports:
+    - "8086:8086"
+    - "8083:8083"
+  restart: always
+  environment:
+    - PRE_CREATE_DB=sensors
+    - ADMIN_USER=root
+    - INFLUXDB_INIT_PWD=root
+    - INFLUXDB_REPORTING_DISABLED=true
+    - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
+    - INFLUXDB_HTTP_LOG_ENABLED=false
+    - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
+serializer:
+  build: ./serializer
+  links:
+    - consul:consul
+    - influx:influx
+  environment:
+    - PORT=10000
+    - CONSUL_HOST=consul
+    - INFLUXDB_HOST=influx
+    - INFLUXDB_USER=root
+    - INFLUXDB_PWD=root
+  expose:
+    - "10000"
+  restart: always
+frontend:
+  build: ./frontend
+  links:
+    - consul:consul
+  environment:
+    - CONSUL_HOST=consul
+    - PORT=10001
+  ports:
+    - 10001:10001
+  restart: always
+smartthings:
+  build: ./smartthings
+  expose:
+    - "8080"
+  environment:
+    - PORT=8080
+  restart: always
+temperature:
+  build: ./temperature
+  expose:
+    - "8080"
+  links:
+    - consul:consul
+    - smartthings:smartthings
+  env_file:
+    - sensors.env
+  restart: always
+motion:
+  build: ./motion
+  expose:
+    - "8080"
+  links:
+    - consul:consul
+    - smartthings:smartthings
+  env_file:
+    - sensors.env
+  restart: always
+humidity:
+  build: ./humidity
+  expose:
+    - "8080"
+  links:
+    - consul:consul
+    - smartthings:smartthings
+  env_file:
+    - sensors.env
+  restart: always
+

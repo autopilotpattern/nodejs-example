@@ -1,0 +1,47 @@
+{
+  "consul": "localhost:8500",
+  "services": [
+    {
+      "name": "frontend",
+      "port": {{.PORT}},
+      "health": "/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/heartbeat",
+      "poll": 3,
+      "ttl": 10
+    }
+  ],
+  "coprocesses": [
+    {
+      "command": ["/usr/local/bin/consul", "agent",
+                  "-data-dir=/data",
+                  "-config-dir=/config",
+                  "-rejoin",
+                  "-retry-join", "{{ if .CONSUL_HOST }}{{ .CONSUL_HOST }}{{ else }}consul{{ end }}",
+                  "-retry-max", "10",
+                  "-retry-interval", "10s"],
+      "restarts": "unlimited"
+    }
+  ],
+  "backends": [
+    {
+      "name": "serializer",
+      "poll": 3,
+      "onChange": "pkill -SIGHUP node"
+    }
+  ],
+  "telemetry": {
+    "port": 9090,
+    "tags": ["op"],
+    "sensors": [
+      {
+        "namespace": "containerpilot",
+        "subsystem": "frontend",
+        "name": "free_memory",
+        "help": "Frontend Free Memory",
+        "type": "counter",
+        "poll": 5,
+        "check": ["/bin/memory.sh"],
+        "timeout": "5s"
+      }
+    ]
+  }
+}
