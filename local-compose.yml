@@ -20,7 +20,7 @@ prometheus:
     ports:
       - "9090:9090"
     expose:
-      - "9090"
+      - 9090
     links:
       - consul:consul
     environment:
@@ -34,7 +34,7 @@ influx:
   env_file:
     - influx.env
 serializer:
-  image: d0cker/serializer:2.0.0
+  build: ./serializer
   links:
     - consul:consul
     - influx:influx
@@ -48,41 +48,58 @@ serializer:
     - "10000"
   restart: always
 frontend:
-  image: d0cker/frontend:2.0.0
+  build: ./frontend
   links:
     - consul:consul
   environment:
     - CONSUL_HOST=consul
-    - PORT=80
+    - PORT=10001
   ports:
-    - 80:80
+    - 10001:10001
   restart: always
-  labels:
-    - triton.cns.services=frontend
-humidity:
-  image: d0cker/humidity:2.0.0
+smartthings:
+  build: ./smartthings
   expose:
     - "8080"
-  links:
-    - consul:consul
-  env_file:
-    - sensors.env
-  restart: always
-motion:
-  image: d0cker/motion:2.0.0
-  expose:
-    - "8080"
-  links:
-    - consul:consul
-  env_file:
-    - sensors.env
+  environment:
+    - PORT=8080
   restart: always
 temperature:
-  image: d0cker/temperature:2.0.0
+  build: ./temperature
   expose:
     - "8080"
   links:
     - consul:consul
-  env_file:
-    - sensors.env
+    - smartthings:smartthings
+  environment:
+    - SMARTTHINGS_HOST=smartthings
+    - SMARTTHINGS_PORT=8000
+    - CONSUL_HOST=consul
+    - PORT=8080
+  restart: always
+motion:
+  build: ./motion
+  expose:
+    - "8080"
+  links:
+    - consul:consul
+    - smartthings:smartthings
+  environment:
+    - SMARTTHINGS_HOST=smartthings
+    - SMARTTHINGS_PORT=8000
+    - CONSUL_HOST=consul
+    - PORT=8080
+  restart: always
+humidity:
+  build: ./humidity
+  expose:
+    - "8080"
+  links:
+    - consul:consul
+    - smartthings:smartthings
+  environment:
+    - SMARTTHINGS_HOST=smartthings
+    - SMARTTHINGS_PORT=8000
+    - CONSUL_HOST=consul
+    - PORT=8080
   restart: always
