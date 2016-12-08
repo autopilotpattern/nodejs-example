@@ -9,11 +9,15 @@ const Piloted = require('piloted');
 const Seneca = require('seneca');
 
 
+const internals = {};
+
+
 Piloted.config({ consul: 'localhost:8500', backends: [ { name: 'serializer' } ] }, (err) => {
   if (err) {
     console.error(err);
   }
 
+  initSerializer();
   readData();
 
   const hapi = new Hapi.Server();
@@ -59,30 +63,50 @@ const readData = function () {
       return readAgain();
     }
 
-    const serializer = Seneca();
-    const serializerServer = Piloted('serializer');
-    if (!serializerServer) {
-      console.error('Serializer not found');
-      return readAgain();
-    }
-
-    serializer.client({
-      host: serializerServer.address,
-      port: serializerServer.port
-    });
-
-    data = [].concat.apply([], data);
-
-    serializer.ready(() => {
-      Items.serial(data, (point, next) => {
-        serializer.act({ role: 'serialize', cmd: 'write', type: 'humidity', value: point.value }, next);
-      }, (err) => {
-        readAgain();
-      });
-    });
+    writeData(data);
   });
 };
 
+function writeData (data) {
+  data = [].concat.apply([], data);
+
+  internals.serializer.ready(() => {
+    Items.serial(data, (point, next) => {
+      internals.serializer.act({ role: 'serialize', cmd: 'write', type: 'humidity', value: point.value }, next);
+    }, (err) => {
+      readAgain();
+    });
+  });
+}
+
+function initSerializer () {
+  const serializerServer = Piloted('serializer');
+  if (!serializerServer) {
+    console.error('Serializer not found');
+    internals.serializer = internals.dummySerializer;
+    return setTimeout(initSerializer, 1000);
+  }
+
+  internals.serializer = Seneca();
+  internals.serializer.client({
+    host: serializerServer.address,
+    port: serializerServer.port
+  });
+}
+
+process.on('SIGHUP', () => {
+  initSerializer();
+});
+
 const readAgain = function () {
   setTimeout(readData, 5000);
+};
+
+internals.dummySerializer = {
+  ready: function (cb) {
+    cb();
+  },
+  act: function (pattern, cb) {
+    cb();
+  }
 };

@@ -20,5 +20,12 @@
                   "-retry-interval", "10s"],
       "restarts": "unlimited"
     }
+  ],
+  "backends": [
+    {
+      "name": "influxdb",
+      "poll": 3,
+      "onChange": "pkill -SIGHUP node"
+    }
   ]
 }

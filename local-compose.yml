@@ -25,23 +25,33 @@ prometheus:
       - consul:consul
     environment:
       - CONSUL=consul
-influx:
-  image: tutum/influxdb:latest
+influxdb:
+  build: ../influxdb
   ports:
-    - "8086:8086"
-    - "8083:8083"
+    - "8086"
+    - "8083"
+  expose:
+    - "8086"
   restart: always
-  env_file:
-    - influx.env
+  links:
+    - consul:consul
+  environment:
+    - CONSUL_AGENT=1
+    - CONSUL=consul
+    - LOG_LEVEL=DEBUG
+    - ADMIN_USER=root
+    - INFLUXDB_INIT_PWD=root
+    - INFLUXDB_REPORTING_DISABLED=true
+    - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
+    - INFLUXDB_HTTP_LOG_ENABLED=false
+    - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 serializer:
   build: ./serializer
   links:
     - consul:consul
-    - influx:influx
   environment:
     - PORT=10000
     - CONSUL_HOST=consul
-    - INFLUXDB_HOST=influx
     - INFLUXDB_USER=root
     - INFLUXDB_PWD=root
   expose:
@@ -73,7 +83,7 @@ temperature:
     - smartthings:smartthings
   environment:
     - SMARTTHINGS_HOST=smartthings
-    - SMARTTHINGS_PORT=8000
+    - SMARTTHINGS_PORT=8080
     - CONSUL_HOST=consul
     - PORT=8080
   restart: always
@@ -86,7 +96,7 @@ motion:
     - smartthings:smartthings
   environment:
     - SMARTTHINGS_HOST=smartthings
-    - SMARTTHINGS_PORT=8000
+    - SMARTTHINGS_PORT=8080
     - CONSUL_HOST=consul
     - PORT=8080
   restart: always
@@ -99,7 +109,7 @@ humidity:
     - smartthings:smartthings
   environment:
     - SMARTTHINGS_HOST=smartthings
-    - SMARTTHINGS_PORT=8000
+    - SMARTTHINGS_PORT=8080
     - CONSUL_HOST=consul
     - PORT=8080
   restart: always
