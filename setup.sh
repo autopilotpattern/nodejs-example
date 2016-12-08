@@ -80,6 +80,7 @@ envcheck() {
 
         echo '# Consul discovery via Triton CNS' >> _env
         echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.cns.joyent.com >> _env
+        echo CONSUL_HOST=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.cns.joyent.com >> _env
         echo >> _env
 
         echo '# SmartThings via Triton CNS' >> _env
