@@ -68,7 +68,7 @@ temperature:
     - _env
   restart: always
 smartthings:
-  build: d0cker/smartthings:3.0.0
+  image: d0cker/smartthings:3.0.0
   labels:
     - triton.cns.services=smartthings
   ports:
