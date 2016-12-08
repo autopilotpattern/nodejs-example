@@ -87,7 +87,7 @@ envcheck() {
         echo 'SMARTTHINGS_PORT=80' >> _env
         echo >> _env
 
-        echo 'Edit the _env file with your desired INFLUXDB_* config'
+        echo 'Edit the _env file with your desired config'
     else
         echo 'Existing _env file found, exiting'
         exit
