@@ -82,9 +82,16 @@ function writeData (data) {
   });
 }
 
+let failCount = 0;
 function initSerializer () {
   const serializerServer = Piloted('serializer');
+  if (!serializerServer && failCount > 10) {
+    failCount = 0;
+    return process.emit('SIGHUP');       // hit consul again and refresh our list
+  }
+
   if (!serializerServer) {
+    failCount++;
     console.error('Serializer not found');
     internals.serializer = internals.dummySerializer;
     return setTimeout(initSerializer, 1000);
