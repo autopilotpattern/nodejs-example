@@ -11,6 +11,9 @@ const Seneca = require('seneca');
 
 const internals = {};
 
+process.on('SIGHUP', () => {
+  console.log('SIGHUP')
+});
 
 Piloted.config({ consul: 'localhost:8500', backends: [ { name: 'serializer' } ] }, (err) => {
   if (err) {
@@ -52,7 +55,7 @@ const readData = function () {
     role: 'smartthings',
     cmd: 'read',
     type: 'temperature',
-    ago: 5
+    ago: 1
   }, (err, data) => {
     if (err) {
       console.error(err);

@@ -28,7 +28,7 @@ function setupSeneca () {
 
   seneca.add({ role: 'serialize', cmd: 'read' }, (args, cb) => {
     let results = [];
-    Items.serial(['motion', 'humidity', 'temperature'], (type, next) => {
+    Items.parallel(['motion', 'humidity', 'temperature'], (type, next) => {
       readPoints(type, args.ago, (err, result) => {
         results = results.concat(result);
         next();
@@ -107,7 +107,13 @@ function setupDb () {
   });
 }
 
-process.on('SIGHUP', setupDb);
+process.on('SIGHUP', () => {
+  setupDb();
+});
+
+process.on('SIGHUP', () => {
+  console.log('SIGHUP')
+});
 
 
 function writePoint (type, value, cb) {
@@ -124,14 +130,14 @@ function readPoints (type, ago, cb) {
   ago = ago || 0;
   const query = `select * from ${type} where time > now() - ${ago}m`;
   internals.db.query(query, { database: internals.dbName })
-  .then((results) => {
-    if (results && results.length && results[0] && results[0].length) {
-      for (let i = 0; i < results[0].length; ++i) {
-        results[0][i].type = type;
+  .then((rows) => {
+    if (rows && rows.length) {
+      for (let i = 0; i < rows.length; ++i) {
+        rows[i].type = type;
       }
     }
 
-    return cb(null, results);
+    cb(null, rows);
   })
   .catch((err) => {
     return cb(err);

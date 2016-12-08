@@ -26,7 +26,7 @@ prometheus:
     environment:
       - CONSUL=consul
 influxdb:
-  build: ../influxdb
+  image: d0cker/influxdb
   ports:
     - "8086"
     - "8083"
