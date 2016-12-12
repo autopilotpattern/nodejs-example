@@ -1,5 +1,5 @@
 consul:
-  image: autopilotpattern/consul:latest
+  image: autopilotpattern/consul
   restart: always
   dns:
     - 127.0.0.1
@@ -19,70 +19,60 @@ prometheus:
     restart: always
     ports:
       - "9090:9090"
-    expose:
-      - "9090"
-    links:
-      - consul:consul
-    environment:
-      - CONSUL=consul
+    env_file:
+      - _env
 influx:
-  image: tutum/influxdb:latest
-  ports:
-    - "8086:8086"
-    - "8083:8083"
+  image: autopilotpattern/influxdb
   restart: always
   env_file:
-    - influx.env
-serializer:
-  image: d0cker/serializer:2.0.0
-  links:
-    - consul:consul
-    - influx:influx
+    - _env
   environment:
-    - PORT=10000
-    - CONSUL_HOST=consul
-    - INFLUXDB_HOST=influx
+    - ADMIN_USER=root
+    - INFLUXDB_INIT_PWD=root
+    - INFLUXDB_REPORTING_DISABLED=true
+    - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
+    - INFLUXDB_HTTP_LOG_ENABLED=false
+    - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
+serializer:
+  image: d0cker/serializer:3.0.0
+  env_file:
+    - _env
+  environment:
     - INFLUXDB_USER=root
     - INFLUXDB_PWD=root
   expose:
-    - "10000"
+    - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:2.0.0
-  links:
-    - consul:consul
-  environment:
-    - CONSUL_HOST=consul
-    - PORT=80
+  image: d0cker/frontend:3.0.0
+  env_file:
+    - _env
   ports:
-    - 80:80
+    - "80:80"
   restart: always
   labels:
     - triton.cns.services=frontend
 humidity:
-  image: d0cker/humidity:2.0.0
-  expose:
-    - "8080"
-  links:
-    - consul:consul
+  image: d0cker/humidity:3.0.0
   env_file:
-    - sensors.env
+    - _env
   restart: always
 motion:
-  image: d0cker/motion:2.0.0
-  expose:
-    - "8080"
-  links:
-    - consul:consul
+  image: d0cker/motion:3.0.0
   env_file:
-    - sensors.env
+    - _env
   restart: always
 temperature:
-  image: d0cker/temperature:2.0.0
-  expose:
-    - "8080"
-  links:
-    - consul:consul
+  image: d0cker/temperature:3.0.0
   env_file:
-    - sensors.env
+    - _env
+  restart: always
+smartthings:
+  image: d0cker/smartthings:3.0.0
+  labels:
+    - triton.cns.services=smartthings
+  ports:
+    - "80:80"
+  environment:
+    - PORT=80
   restart: always

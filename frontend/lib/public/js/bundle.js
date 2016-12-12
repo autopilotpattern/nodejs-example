@@ -55,7 +55,7 @@ var updateChart = function(graph, point) {
   var previousPoint = graph.series[0].data[graph.series[0].data.length - 1];
   var oldTime = previousPoint ? previousPoint.x : 0;
   var newTime = Math.round(point.time / 1000);
-  if (oldTime > newTime) {
+  if (oldTime >= (newTime - 1)) {
     return;
   }
 

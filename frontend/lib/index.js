@@ -11,6 +11,10 @@ const Seneca = require('seneca');
 const WebStream = require('./webStream');
 
 
+process.on('SIGHUP', () => {
+  console.log('SIGHUP')
+});
+
 Piloted.config({ consul: 'localhost:8500', backends: [ { name: 'serializer' } ] }, (err) => {
   if (err) {
     console.error(err);
@@ -91,5 +95,5 @@ const startReading = function (webStream) {
         webStream.emit([].concat.apply([], toEmit));
       }
     });
-  }, 2000);
+  }, 1000);
 };
