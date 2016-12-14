@@ -7,19 +7,12 @@ const Brule = require('brule');
 const Hapi = require('hapi');
 const Inert = require('inert');
 const Piloted = require('piloted');
-const Seneca = require('seneca');
 const WebStream = require('./webStream');
+const Wreck = require('wreck');
 
 
-process.on('SIGHUP', () => {
-  console.log('SIGHUP')
-});
 
-Piloted.config({ consul: 'localhost:8500', backends: [ { name: 'serializer' } ] }, (err) => {
-  if (err) {
-    console.error(err);
-  }
-
+function main () {
   const serverConfig = {
     connections: {
       routes: {
@@ -45,35 +38,27 @@ Piloted.config({ consul: 'localhost:8500', backends: [ { name: 'serializer' } ] 
       }
     });
 
-    startReading(WebStream(server.listener));
-
     server.start(() => {
       console.log(`listening at http://localhost:${server.info.port}`);
+      startReading(WebStream(server.listener));
     });
   });
-});
+}
+main();
 
-const startReading = function (webStream) {
+function startReading (webStream) {
   let lastEmitted = 0;
   setInterval(() => {
-    const serializer = Piloted('serializer');
+    const serializer = Piloted.service('serializer');
     if (!serializer) {
+      console.log('Serializer not found');
       return;
     }
 
-    const seneca = Seneca();
-    seneca.client({
-      host: serializer.address,
-      port: serializer.port
-    });
-
-    seneca.act({
-      role: 'serialize',
-      cmd: 'read',
-      ago: 5                // Minutes ago
-    }, (err, points) => {
+    Wreck.get(`http://${serializer.address}:${serializer.port}/read`, { json: 'force' }, (err, res, points) => {
       if (err) {
-        console.error(err);
+        console.error('Error making request to serializer: ' + err);
+        return;
       }
 
       if (!points || !points.length) {
@@ -81,7 +66,6 @@ const startReading = function (webStream) {
       }
 
       let toEmit = [];
-      points = [].concat.apply([], points);
       points.forEach((point) => {
         point.time = (new Date(point.time || Date.now())).getTime();
 
@@ -96,4 +80,4 @@ const startReading = function (webStream) {
       }
     });
   }, 1000);
-};
+}

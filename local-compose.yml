@@ -1,5 +1,5 @@
 consul:
-  image: autopilotpattern/consul:latest
+  image: autopilotpattern/consul
   restart: always
   dns:
     - 127.0.0.1
@@ -11,6 +11,7 @@ consul:
     /usr/local/bin/containerpilot
     /bin/consul agent -server
       -config-dir=/etc/consul
+      -log-level=err
       -bootstrap-expect 1
       -ui-dir /ui
 prometheus:
@@ -19,8 +20,6 @@ prometheus:
     restart: always
     ports:
       - "9090:9090"
-    expose:
-      - 9090
     links:
       - consul:consul
     environment:
@@ -30,15 +29,12 @@ influxdb:
   ports:
     - "8086"
     - "8083"
-  expose:
-    - "8086"
   restart: always
   links:
     - consul:consul
   environment:
     - CONSUL_AGENT=1
     - CONSUL=consul
-    - LOG_LEVEL=DEBUG
     - ADMIN_USER=root
     - INFLUXDB_INIT_PWD=root
     - INFLUXDB_REPORTING_DISABLED=true
@@ -75,41 +71,38 @@ smartthings:
     - PORT=8080
   restart: always
 temperature:
-  build: ./temperature
-  expose:
-    - "8080"
+  build: ./sensor
   links:
     - consul:consul
     - smartthings:smartthings
   environment:
+    - SENSOR_TYPE=temperature
+    - PORT=8080
     - SMARTTHINGS_HOST=smartthings
     - SMARTTHINGS_PORT=8080
     - CONSUL_HOST=consul
-    - PORT=8080
   restart: always
 motion:
-  build: ./motion
-  expose:
-    - "8080"
+  build: ./sensor
   links:
     - consul:consul
     - smartthings:smartthings
   environment:
+    - SENSOR_TYPE=motion
+    - PORT=8080
     - SMARTTHINGS_HOST=smartthings
     - SMARTTHINGS_PORT=8080
     - CONSUL_HOST=consul
-    - PORT=8080
   restart: always
 humidity:
-  build: ./humidity
-  expose:
-    - "8080"
+  build: ./sensor
   links:
     - consul:consul
     - smartthings:smartthings
   environment:
+    - SENSOR_TYPE=humidity
+    - PORT=8080
     - SMARTTHINGS_HOST=smartthings
     - SMARTTHINGS_PORT=8080
     - CONSUL_HOST=consul
-    - PORT=8080
   restart: always

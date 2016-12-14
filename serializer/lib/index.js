@@ -6,84 +6,112 @@ const Hapi = require('hapi');
 const Influx = require('influx');
 const Items = require('items');
 const Piloted = require('piloted');
-const Seneca = require('seneca');
 
 
 const internals = {
-  dbName: 'sensors'
+  dbName: 'sensors',
+  failCount: 0
 };
 
-Piloted.config({ consul: 'localhost:8500', backends: [ { name: 'influxdb' } ] }, (err) => {
-  if (err) {
-    console.error(err);
-  }
-
-  setupDb();
-  setupSeneca();
-});
-
-
-function setupSeneca () {
-  const seneca = Seneca();
-
-  seneca.add({ role: 'serialize', cmd: 'read' }, (args, cb) => {
-    let results = [];
-    Items.parallel(['motion', 'humidity', 'temperature'], (type, next) => {
-      readPoints(type, args.ago, (err, result) => {
-        results = results.concat(result);
-        next();
-      });
-    }, () => {
-      cb(null, FlattenDeep(results));
+const bufferedDb = {
+  draining: false,
+  data: [],
+  writePoints: function (points) {
+    console.log('Write in dummy db');
+    bufferedDb.data = bufferedDb.data.concat(points);
+    return new Promise((resolve) => {
+      resolve();
     });
-  });
-
-  seneca.add({ role: 'serialize', cmd: 'read', type: 'temperature' }, (args, cb) => {
-    readPoints('temperature', args.ago, cb);
-  });
-
-  seneca.add({ role: 'serialize', cmd: 'read', type: 'humidity' }, (args, cb) => {
-    readPoints('humidity', args.ago, cb);
-  });
-
-  seneca.add({ role: 'serialize', cmd: 'read', type: 'motion' }, (args, cb) => {
-    readPoints('motion', args.ago, cb);
-  });
-
-  seneca.add({ role: 'serialize', cmd: 'write', type: 'temperature' }, (args, cb) => {
-    writePoint('temperature', args.value, cb);
-  });
-
-  seneca.add({ role: 'serialize', cmd: 'write', type: 'humidity' }, (args, cb) => {
-    writePoint('humidity', args.value, cb);
-  });
-
-  seneca.add({ role: 'serialize', cmd: 'write', type: 'motion' }, (args, cb) => {
-    writePoint('motion', args.value, cb);
-  });
-
-  seneca.listen({ port: process.env.PORT });
-
-  const hapi = new Hapi.Server();
-  hapi.connection({ host: '127.0.0.1', port: 8080 });
-  hapi.register(Brule, (err) => {
-    if (err) {
-      console.error(err);
+  },
+  query: function(query) {
+    return new Promise((resolve) => {
+      resolve(bufferedDb.data);
+    });
+  },
+  drain: function () {
+    if (bufferedDb.draining) {
+      return;
     }
 
-    hapi.start((err) => {
+    bufferedDb.draining = true;
+    Items.serial(bufferedDb.data, (data, next) => {
+      writePoint(data.measurement, data.fields.value, next);
+    }, (err) => {
+      bufferedDb.data = [];
+      bufferedDb.draining = false;
+    });
+  }
+};
+
+
+function main () {
+  setupDb();
+  setupHapi();
+}
+main();
+
+
+function setupHapi () {
+  const server = new Hapi.Server();
+  server.connection({ port: process.env.PORT });
+  server.register(Brule, (err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+
+    server.route({
+      method: 'POST',
+      path: '/write/{type}',
+      handler: writeHandler
+    });
+
+    server.route({
+      method: 'GET',
+      path: '/read',
+      handler: readHandler
+    });
+
+    server.start((err) => {
       if (err) {
         console.error(err);
+        process.exit(1);
       }
 
-      console.log(`Hapi server started at http://127.0.0.1:${hapi.info.port}`);
+      console.log(`Hapi server started at http://localhost:${server.info.port}`);
     });
   });
 }
 
+function writeHandler (request, reply) {
+  Items.serial(request.payload, (point, next) => {
+    writePoint(request.params.type, point.value, next);
+  }, () => {
+    reply({});
+  })
+}
+
+function readHandler (request, reply) {
+  let results = [];
+  Items.parallel(['motion', 'humidity', 'temperature'], (type, next) => {
+    readPoints(type, 1, (err, result) => {
+      results = results.concat(result);
+      next();
+    });
+  }, () => {
+    reply(FlattenDeep(results));
+  });
+}
+
 function setupDb () {
-  const influxServer = Piloted('influxdb');
+  const influxServer = Piloted.service('influxdb');
+  if (!influxServer && internals.failCount > 10) {
+    internals.failCount = 0;
+    Piloted.refresh();
+  }
+
   if (!influxServer) {
+    internals.failCount++;
     internals.db = bufferedDb;
     return setTimeout(setupDb, 1000);
   }
@@ -103,16 +131,13 @@ function setupDb () {
     console.error(`Error creating Influx database!`);
     console.error(err);
 
-    bufferedDb.drain();
+    // Influx may not be entirely ready
+    setTimeout(setupDb, 1000);
   });
 }
 
-process.on('SIGHUP', () => {
+Piloted.on('refresh', () => {
   setupDb();
-});
-
-process.on('SIGHUP', () => {
-  console.log('SIGHUP')
 });
 
 
@@ -127,7 +152,7 @@ function writePoint (type, value, cb) {
 };
 
 function readPoints (type, ago, cb) {
-  ago = ago || 0;
+  ago = ago || 1;
   const query = `select * from ${type} where time > now() - ${ago}m`;
   internals.db.query(query, { database: internals.dbName })
   .then((rows) => {
@@ -136,40 +161,10 @@ function readPoints (type, ago, cb) {
         rows[i].type = type;
       }
     }
-
     cb(null, rows);
   })
   .catch((err) => {
+    console.error('Error querying db: ' + err);
     return cb(err);
   });
-};
-
-
-const bufferedDb = {
-  draining: false,
-  data: [],
-  writePoint: function (points) {
-    bufferedDb.data = bufferedDb.data.concat(points);
-    return new Promise((resolve) => {
-      resolve();
-    });
-  },
-  query: function(query) {
-    return new Promise((resolve) => {
-      resolve();
-    });
-  },
-  drain: function () {
-    if (bufferedDb.draining) {
-      return;
-    }
-
-    bufferedDb.draining = true;
-    Items.serial(bufferedDb.data, (data, next) => {
-      writePoint(data.measurement, data.fields.value, next);
-    }, (err) => {
-      bufferedDb.data = [];
-      bufferedDb.draining = false;
-    });
-  }
 };

@@ -8,14 +8,12 @@ module.exports = function (server) {
   let streamCounter = 0;
   const streams = {};
 
-
   const emit = (data) => {
     const ids = Object.keys(streams);
     ids.forEach((id) => {
       streams[id].write(JSON.stringify(data), () => {});
     });
   };
-
 
   const handleStream = (stream) => {
     stream.id = streamCounter++;
