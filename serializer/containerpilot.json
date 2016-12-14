@@ -4,7 +4,7 @@
     {
       "name": "serializer",
       "port": {{.PORT}},
-      "health": "/usr/bin/curl -o /dev/null --fail -s http://localhost:8080/heartbeat",
+      "health": "/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/check-it-out",
       "poll": 3,
       "ttl": 10
     }
@@ -14,6 +14,7 @@
       "command": ["/usr/local/bin/consul", "agent",
                   "-data-dir=/data",
                   "-config-dir=/config",
+                  "-log-level=err",
                   "-rejoin",
                   "-retry-join", "{{ if .CONSUL_HOST }}{{ .CONSUL_HOST }}{{ else }}consul{{ end }}",
                   "-retry-max", "10",

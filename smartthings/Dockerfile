@@ -1,4 +1,4 @@
-FROM mhart/alpine-node:latest
+FROM node:alpine
 
 RUN apk update && \
     apk add curl && \

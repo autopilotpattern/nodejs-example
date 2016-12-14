@@ -1,11 +1,11 @@
-FROM mhart/alpine-node:latest
+FROM node:alpine
 
 RUN apk update && \
     apk add curl && \
     rm -rf /var/cache/apk/*
 
-RUN export CONSUL_VERSION=0.7.0 \
-    && export CONSUL_CHECKSUM=b350591af10d7d23514ebaa0565638539900cdb3aaa048f077217c4c46653dd8 \
+RUN export CONSUL_VERSION=0.7.1 \
+    && export CONSUL_CHECKSUM=5dbfc555352bded8a39c7a8bf28b5d7cf47dec493bc0496e21603c84dfe41b4b \
     && curl --retry 7 --fail -vo /tmp/consul.zip "https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip" \
     && echo "${CONSUL_CHECKSUM}  /tmp/consul.zip" | sha256sum -c \
     && unzip /tmp/consul -d /usr/local/bin \
@@ -13,8 +13,8 @@ RUN export CONSUL_VERSION=0.7.0 \
     && mkdir /config
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 2.4.1
-RUN export CP_SHA1=198d96c8d7bfafb1ab6df96653c29701510b833c \
+ENV CONTAINERPILOT_VERSION 2.6.0
+RUN export CP_SHA1=c1bcd137fadd26ca2998eec192d04c08f62beb1f \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
