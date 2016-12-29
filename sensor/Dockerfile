@@ -1,11 +1,11 @@
-FROM node:alpine
+FROM node:6-alpine
 
 RUN apk update && \
     apk add curl && \
     rm -rf /var/cache/apk/*
 
-RUN export CONSUL_VERSION=0.7.1 \
-    && export CONSUL_CHECKSUM=5dbfc555352bded8a39c7a8bf28b5d7cf47dec493bc0496e21603c84dfe41b4b \
+RUN export CONSUL_VERSION=0.7.0 \
+    && export CONSUL_CHECKSUM=b350591af10d7d23514ebaa0565638539900cdb3aaa048f077217c4c46653dd8 \
     && curl --retry 7 --fail -vo /tmp/consul.zip "https://releases.hashicorp.com/consul/${CONSUL_VERSION}/consul_${CONSUL_VERSION}_linux_amd64.zip" \
     && echo "${CONSUL_CHECKSUM}  /tmp/consul.zip" | sha256sum -c \
     && unzip /tmp/consul -d /usr/local/bin \

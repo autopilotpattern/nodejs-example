@@ -30,12 +30,13 @@ influx:
   environment:
     - ADMIN_USER=root
     - INFLUXDB_INIT_PWD=root
+    - INFLUXDB_ADMIN_ENABLED=true
     - INFLUXDB_REPORTING_DISABLED=true
     - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
     - INFLUXDB_HTTP_LOG_ENABLED=false
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 serializer:
-  image: d0cker/serializer:4.0.0
+  image: d0cker/serializer:5.0.0
   env_file:
     - _env
   environment:
@@ -45,7 +46,7 @@ serializer:
     - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:4.0.0
+  image: d0cker/frontend:5.0.0
   env_file:
     - _env
   ports:
@@ -54,28 +55,28 @@ frontend:
   labels:
     - triton.cns.services=frontend
 humidity:
-  image: d0cker/sensor:1.0.0
+  image: d0cker/sensor:2.0.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=humidity
   restart: always
 motion:
-  image: d0cker/sensor:1.0.0
+  image: d0cker/sensor:2.0.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=motion
   restart: always
 temperature:
-  image: d0cker/sensor:1.0.0
+  image: d0cker/sensor:2.0.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=temperature
   restart: always
 smartthings:
-  image: d0cker/smartthings:4.0.0
+  image: d0cker/smartthings:5.0.0
   labels:
     - triton.cns.services=smartthings
   ports:

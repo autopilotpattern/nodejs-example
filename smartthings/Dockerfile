@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:6-alpine
 
 RUN apk update && \
     apk add curl && \
