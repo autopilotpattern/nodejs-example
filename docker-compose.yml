@@ -22,7 +22,7 @@ prometheus:
       - "9090:9090"
     env_file:
       - _env
-influx:
+influxdb:
   image: autopilotpattern/influxdb
   restart: always
   env_file:
