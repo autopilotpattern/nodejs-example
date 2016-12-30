@@ -8,7 +8,7 @@ Example microservices implementation using Node.js and Docker. Below is an archi
 
 ### Development
 
-In local development you can start the microservices by running 
+In local development you can start the microservices by running
 
 ```sh
 $ docker-compose -f local-compose.yml up -d
@@ -31,6 +31,3 @@ $ docker-compose up -d
 This project is inspired by various microservices workshops and trainings. In no particular order, they are:
 * https://github.com/lloydbenson/microservices-workshop - Lloyd Benson
 * https://github.com/nearform/micro-services-tutorial-iot - nearForm
-
-
-
