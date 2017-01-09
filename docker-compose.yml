@@ -76,7 +76,7 @@ temperature:
     - SENSOR_TYPE=temperature
   restart: always
 smartthings:
-  image: d0cker/smartthings:5.0.0
+  image: d0cker/smartthings:6.0.0
   labels:
     - triton.cns.services=smartthings
   ports:
