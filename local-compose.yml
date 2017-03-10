@@ -1,5 +1,5 @@
 consul:
-  image: autopilotpattern/consul
+  image: autopilotpattern/consul:0.7r0.7
   restart: always
   dns:
     - 127.0.0.1
