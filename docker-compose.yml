@@ -15,7 +15,7 @@ consul:
       -bootstrap-expect 1
       -ui-dir /ui
 prometheus:
-    image: autopilotpattern/prometheus:fixed-key
+    image: autopilotpattern/prometheus:1.3.0r1.0
     mem_limit: 128m
     restart: always
     ports:
