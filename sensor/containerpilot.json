@@ -27,6 +27,11 @@
       "name": "serializer",
       "poll": 3,
       "onChange": "pkill -SIGHUP node"
+    },
+    {
+      "name": "smartthings",
+      "poll": 3,
+      "onChange": "pkill -SIGHUP node"
     }
   ]
 }

@@ -12,7 +12,8 @@ const Wreck = require('wreck');
 
 const internals = {
   type: process.env.SENSOR_TYPE,
-  failCount: 0
+  serializerFails: 0,
+  smartthingsFails: 0
 };
 
 
@@ -33,12 +34,7 @@ function main () {
 
       console.log(`Hapi server started at http://127.0.0.1:${hapi.info.port}`);
 
-      internals.smartthings = Seneca();
-      internals.smartthings.client({
-        host: process.env.SMARTTHINGS_HOST,
-        port: process.env.SMARTTHINGS_PORT
-      });
-
+      configureSmartthings();
       readData();
     });
   });
@@ -47,6 +43,10 @@ main();
 
 
 function readData () {
+  if (!internals.smartthings) {
+    return readAgain();
+  }
+
   internals.smartthings.act({
     role: 'smartthings',
     cmd: 'read',
@@ -68,13 +68,13 @@ function readData () {
 
 function writeData (data) {
   const serializer = Piloted.service('serializer');
-  if (!serializer && internals.failCount > 10) {
-    internals.failCount = 0;
+  if (!serializer && internals.serializerFails > 10) {
+    internals.serializerFails = 0;
     Piloted.refresh();       // hit consul again and refresh our list
   }
 
   if (!serializer) {
-    internals.failCount++;
+    internals.serializerFails++;
     console.error('Serializer not found');
     return setTimeout(() => { writeData(data); }, 1000);
   }
@@ -86,3 +86,29 @@ function writeData (data) {
 function readAgain () {
   setTimeout(readData, 5000);
 };
+
+function configureSmartthings() {
+  const smartthings = Piloted.serviceHosts('smartthings');
+  if (!smartthings && internals.smartthingsFails > 10) {
+    internals.smartthingsFails = 0;
+    Piloted.refresh();       // hit consul again and refresh our list
+  }
+
+  if (!smartthings) {
+    internals.smartthingsFails++;
+    console.error('Smartthings not found');
+    return setTimeout(() => { configureSmartthings(); }, 1000);
+  }
+
+  const randomIndex = Math.floor(Math.random() * smartthings.length);
+  const smartthingsServer = smartthings[randomIndex];
+  internals.smartthings = Seneca();
+  internals.smartthings.client({
+    host: smartthingsServer.address,
+    port: smartthingsServer.port
+  });
+}
+
+Piloted.on('refresh', () => {
+  configureSmartthings();
+});
