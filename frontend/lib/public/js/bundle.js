@@ -66,25 +66,37 @@ var updateChart = function(graph, point) {
   graph.series[0].data.push({ x: newTime, y: point.value });
 };
 
-
-$(document).ready(function() {
-  var tempChart = initChart('temperature');
-  var humidityChart = initChart('humidity');
-  var motionChart = initChart('motion');
-
+function setupStream() {
   var stream = websocket(document.URL.replace('http', 'ws'));
   stream.on('data', function(data) {
     var parsed = JSON.parse(data);
     for (var i = 0; i < parsed.length; ++i) {
       var point = parsed[i];
-      var chart = point.type === 'temperature' ? tempChart : (point.type === 'humidity' ? humidityChart : motionChart);
+      var chart = point.type === 'temperature' ? document._tempChart : (point.type === 'humidity' ? document._humidityChart : document._motionChart);
       updateChart(chart, point);
     }
 
-    tempChart.render();
-    humidityChart.render();
-    motionChart.render();
+    document._tempChart.render();
+    document._humidityChart.render();
+    document._motionChart.render();
   });
+
+  stream.once('end', function () {
+    setupStream();
+  });
+
+  stream.once('error', function (err) {
+    console.log(err);
+    setTimeout(setupStream, 1000);
+  });
+}
+
+$(document).ready(function() {
+  document._tempChart = initChart('temperature');
+  document._humidityChart = initChart('humidity');
+  document._motionChart = initChart('motion');
+
+  setupStream();
 });
 
 

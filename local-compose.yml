@@ -63,6 +63,8 @@ frontend:
   ports:
     - 10001:10001
   restart: always
+  volumes:
+    - "./frontend/lib/public:/opt/app/lib/public"
 smartthings:
   build: ./smartthings
   links:
