@@ -13,8 +13,8 @@ RUN export CONSUL_VERSION=0.7.0 \
     && mkdir /config
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 2.6.0
-RUN export CP_SHA1=c1bcd137fadd26ca2998eec192d04c08f62beb1f \
+ENV CONTAINERPILOT_VERSION 3.0.0-dev.1
+RUN export CP_SHA1=bbeb4ed54d2e192fdd42d195fb3a0aa5726837b5 \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
@@ -32,5 +32,4 @@ COPY package.json /opt/app/
 COPY lib/* /opt/app/lib/
 RUN cd /opt/app && npm install
 
-ENTRYPOINT ["/bin/containerpilot", "node"]
-CMD ["/opt/app/"]
+CMD ["/bin/containerpilot"]

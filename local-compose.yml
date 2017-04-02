@@ -79,7 +79,6 @@ temperature:
     - consul:consul
   environment:
     - SENSOR_TYPE=temperature
-    - PORT=8080
     - CONSUL_HOST=consul
   restart: always
 motion:
@@ -88,7 +87,6 @@ motion:
     - consul:consul
   environment:
     - SENSOR_TYPE=motion
-    - PORT=8080
     - CONSUL_HOST=consul
   restart: always
 humidity:
@@ -97,6 +95,5 @@ humidity:
     - consul:consul
   environment:
     - SENSOR_TYPE=humidity
-    - PORT=8080
     - CONSUL_HOST=consul
   restart: always

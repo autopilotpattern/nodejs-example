@@ -2,8 +2,6 @@
 
 // Load modules
 
-const Brule = require('brule');
-const Hapi = require('hapi');
 const Items = require('items');
 const Piloted = require('piloted');
 const Seneca = require('seneca');
@@ -15,31 +13,6 @@ const internals = {
   serializerFails: 0,
   smartthingsFails: 0
 };
-
-
-function main () {
-  const hapi = new Hapi.Server();
-  hapi.connection({ host: '127.0.0.1', port: process.env.PORT });
-  hapi.register(Brule, (err) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-
-    hapi.start((err) => {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-
-      console.log(`Hapi server started at http://127.0.0.1:${hapi.info.port}`);
-
-      configureSmartthings();
-      readData();
-    });
-  });
-}
-main();
 
 
 function readData () {
@@ -107,8 +80,12 @@ function configureSmartthings() {
     host: smartthingsServer.address,
     port: smartthingsServer.port
   });
+
+  readData();
 }
 
 Piloted.on('refresh', () => {
   configureSmartthings();
 });
+
+configureSmartthings();

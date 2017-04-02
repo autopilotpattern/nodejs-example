@@ -3,15 +3,12 @@
   "services": [
     {
       "name": "{{.SENSOR_TYPE}}",
-      "health": "/usr/bin/curl -o /dev/null --fail -s http://127.0.0.1:{{.PORT}}/check-it-out",
-      "poll": 3,
-      "ttl": 10,
-      "port": {{.PORT}}
-    }
-  ],
-  "coprocesses": [
+      "exec": "node /opt/app/",
+      "restarts": "unlimited"
+    },
     {
-      "command": ["/usr/local/bin/consul", "agent",
+      "name": "consul-agent",
+      "exec": ["/usr/local/bin/consul", "agent",
                   "-data-dir=/data",
                   "-config-dir=/config",
                   "-log-level=err",
