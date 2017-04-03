@@ -4,14 +4,14 @@
     {
       "name": "serializer",
       "port": {{.PORT}},
+      "exec": "node /opt/app/",
       "health": "/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/check-it-out",
       "poll": 3,
       "ttl": 10
-    }
-  ],
-  "coprocesses": [
+    },
     {
-      "command": ["/usr/local/bin/consul", "agent",
+      "name": "consul-agent",
+      "exec": ["/usr/local/bin/consul", "agent",
                   "-data-dir=/data",
                   "-config-dir=/config",
                   "-log-level=err",

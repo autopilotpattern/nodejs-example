@@ -2,9 +2,12 @@
   "consul": "localhost:8500",
   "services": [
     {
-      "name": "{{.SENSOR_TYPE}}",
+      "name": "smartthings",
+      "port": {{.PORT}},
       "exec": "node /opt/app/",
-      "restarts": "unlimited"
+      "health": "/opt/app/health.sh",
+      "poll": 3,
+      "ttl": 30
     },
     {
       "name": "consul-agent",
@@ -17,18 +20,6 @@
                   "-retry-max", "10",
                   "-retry-interval", "10s"],
       "restarts": "unlimited"
-    }
-  ],
-  "backends": [
-    {
-      "name": "serializer",
-      "poll": 3,
-      "onChange": "pkill -SIGHUP node"
-    },
-    {
-      "name": "smartthings",
-      "poll": 3,
-      "onChange": "pkill -SIGHUP node"
     }
   ]
 }
