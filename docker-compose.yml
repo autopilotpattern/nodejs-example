@@ -60,6 +60,8 @@ smartthings:
     - triton.cns.services=smartthings
   ports:
     - "80:80"
+  env_file:
+    - _env
   environment:
     - PORT=80
   restart: always
