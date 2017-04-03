@@ -1,5 +1,5 @@
 consul:
-  image: autopilotpattern/consul:0.7r0.7
+  image: autopilotpattern/consul:0.7.2-r0.8
   restart: always
   dns:
     - 127.0.0.1
@@ -35,7 +35,7 @@ influxdb:
   environment:
     - CONSUL=consul
     - ADMIN_USER=root
-    - INFLUXDB_INIT_PWD=root
+    - INFLUXDB_INIT_PWD=root123
     - INFLUXDB_ADMIN_ENABLED=true
     - INFLUXDB_REPORTING_DISABLED=true
     - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
@@ -49,7 +49,7 @@ serializer:
     - PORT=10000
     - CONSUL_HOST=consul
     - INFLUXDB_USER=root
-    - INFLUXDB_PWD=root
+    - INFLUXDB_PWD=root123
   expose:
     - "10000"
   restart: always
@@ -75,12 +75,12 @@ smartthings:
     - PORT=8080
     - CONSUL_HOST=consul
   restart: always
-temperature:
+humidity:
   build: ./sensor
   links:
     - consul:consul
   environment:
-    - SENSOR_TYPE=temperature
+    - SENSOR_TYPE=humidity
     - CONSUL_HOST=consul
   restart: always
 motion:
@@ -91,11 +91,11 @@ motion:
     - SENSOR_TYPE=motion
     - CONSUL_HOST=consul
   restart: always
-humidity:
+temperature:
   build: ./sensor
   links:
     - consul:consul
   environment:
-    - SENSOR_TYPE=humidity
+    - SENSOR_TYPE=temperature
     - CONSUL_HOST=consul
   restart: always
