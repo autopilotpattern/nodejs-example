@@ -57,7 +57,7 @@ function writeData (data) {
 }
 
 function readAgain () {
-  setTimeout(readData, 5000);
+  setTimeout(readData, 2000);
 };
 
 function configureSmartthings() {
