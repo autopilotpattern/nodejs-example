@@ -48,7 +48,7 @@ serializer:
     - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:6.0.1
+  image: d0cker/frontend:6.0.2
   env_file:
     - _env
   ports:
