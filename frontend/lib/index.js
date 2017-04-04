@@ -67,6 +67,9 @@ function startReading (webStream) {
 
       let toEmit = [];
       points.forEach((point) => {
+        if (!point) {
+          return;
+        }
         point.time = (new Date(point.time || Date.now())).getTime();
 
         if (point.time > lastEmitted) {

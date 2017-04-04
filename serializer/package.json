@@ -7,6 +7,9 @@
   "license": "MPL-2.0",
   "dependencies": {
     "brule": "2.x.x",
+    "good": "7.x.x",
+    "good-file": "6.x.x",
+    "good-squeeze": "5.x.x",
     "hapi": "16.x.x",
     "influx": "5.x.x",
     "items": "2.x.x",

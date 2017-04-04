@@ -7,6 +7,8 @@ consul:
     - triton.cns.services=consul
   ports:
     - "8500:8500"
+  env_file:
+    - _env
   command: >
     /usr/local/bin/containerpilot
     /bin/consul agent -server
@@ -36,7 +38,7 @@ influxdb:
     - INFLUXDB_HTTP_LOG_ENABLED=false
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 serializer:
-  image: d0cker/serializer:6.0.0
+  image: d0cker/serializer:6.1.0
   env_file:
     - _env
   environment:
@@ -46,7 +48,7 @@ serializer:
     - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:6.0.0
+  image: d0cker/frontend:6.0.2
   env_file:
     - _env
   ports:
@@ -62,25 +64,23 @@ smartthings:
     - "80:80"
   env_file:
     - _env
-  environment:
-    - PORT=80
   restart: always
 humidity:
-  image: d0cker/sensor:3.0.0
+  image: d0cker/sensor:3.0.1
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=humidity
   restart: always
 motion:
-  image: d0cker/sensor:3.0.0
+  image: d0cker/sensor:3.0.1
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=motion
   restart: always
 temperature:
-  image: d0cker/sensor:3.0.0
+  image: d0cker/sensor:3.0.1
   env_file:
     - _env
   environment:
