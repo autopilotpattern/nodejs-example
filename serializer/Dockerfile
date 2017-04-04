@@ -26,6 +26,11 @@ ENV CONTAINERPILOT_PATH=/etc/containerpilot.json
 COPY containerpilot.json ${CONTAINERPILOT_PATH}
 ENV CONTAINERPILOT=file://${CONTAINERPILOT_PATH}
 
+RUN mkdir -p /bin/sensors
+COPY sensors/* /bin/sensors/
+RUN chmod 755 /bin/sensors/*.sh
+RUN mkdir -p /var/log/app
+
 # Install our application
 RUN mkdir -p /opt/app/lib
 COPY package.json /opt/app/

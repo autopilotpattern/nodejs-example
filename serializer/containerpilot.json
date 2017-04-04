@@ -28,5 +28,18 @@
       "poll": 3,
       "onChange": "pkill -SIGHUP node"
     }
-  ]
+  ],
+  "telemetry": {
+    "sensors": [
+      {
+        "namespace": "cp",
+        "subsystem": "serializer",
+        "name": "requests",
+        "help": "Number of requests/s",
+        "type": "gauge",
+        "poll": 3,
+        "check": ["/bin/sensors/request_count.sh"]
+      }
+    ]
+  }
 }

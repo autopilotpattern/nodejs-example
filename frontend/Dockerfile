@@ -13,8 +13,8 @@ RUN export CONSUL_VERSION=0.7.0 \
     && mkdir /config
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 2.6.0
-RUN export CP_SHA1=c1bcd137fadd26ca2998eec192d04c08f62beb1f \
+ENV CONTAINERPILOT_VERSION 2.7.2
+RUN export CP_SHA1=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \

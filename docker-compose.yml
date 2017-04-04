@@ -7,6 +7,8 @@ consul:
     - triton.cns.services=consul
   ports:
     - "8500:8500"
+  env_file:
+    - _env
   command: >
     /usr/local/bin/containerpilot
     /bin/consul agent -server

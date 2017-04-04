@@ -2,6 +2,7 @@
 
 const Brule = require('brule');
 const FlattenDeep = require('lodash.flattendeep');
+const Good = require('good');
 const Hapi = require('hapi');
 const Influx = require('influx');
 const Items = require('items');
@@ -54,7 +55,24 @@ main();
 function setupHapi () {
   const server = new Hapi.Server();
   server.connection({ port: process.env.PORT });
-  server.register(Brule, (err) => {
+
+  const goodOptions = {
+    reporters: {
+      fileReporter: [{
+        module: 'good-squeeze',
+        name: 'Squeeze',
+        args: [{ response: '*' }]
+      }, {
+        module: 'good-squeeze',
+        name: 'SafeJson'
+      }, {
+        module: 'good-file',
+        args: ['/var/log/app/requests.log']
+      }]
+    }
+  };
+
+  server.register([Brule, { register: Good, options: goodOptions }], (err) => {
     if (err) {
       console.error(err);
       process.exit(1);
