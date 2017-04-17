@@ -72,7 +72,7 @@ envcheck() {
     # setup environment file
     if [ ! -f "_env" ]; then
         echo 'CONSUL_AGENT=1' > _env
-        echo 'LOG_LEVEL=DEBUG' >> _env
+        echo 'LOG_LEVEL=INFO' >> _env
         echo 'PORT=80' >> _env
         echo >> _env
 
@@ -80,12 +80,11 @@ envcheck() {
 
         echo '# Consul discovery via Triton CNS' >> _env
         echo CONSUL=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.cns.joyent.com >> _env
-        echo CONSUL_HOST=consul.svc.${TRITON_ACCOUNT}.${TRITON_DC}.cns.joyent.com >> _env
         echo >> _env
 
-        echo '# SmartThings via Triton CNS' >> _env
-        echo SMARTTHINGS_HOST=smartthings.svc.${TRITON_ACCOUNT}.${TRITON_DC}.cns.joyent.com >> _env
-        echo 'SMARTTHINGS_PORT=80' >> _env
+        echo '# NATS auth settings' >> _env
+        echo 'NATS_USER=ruser' >> _env
+        echo 'NATS_PASSWORD='$(cat /dev/urandom | LC_ALL=C tr -dc 'A-Za-z0-9' | head -c 7) >> _env
         echo >> _env
 
         echo 'Edit the _env file with your desired config'

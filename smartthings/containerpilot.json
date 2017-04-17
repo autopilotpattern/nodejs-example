@@ -16,10 +16,17 @@
                   "-config-dir=/config",
                   "-log-level=err",
                   "-rejoin",
-                  "-retry-join", "{{ if .CONSUL_HOST }}{{ .CONSUL_HOST }}{{ else }}consul{{ end }}",
+                  "-retry-join", "{{ if .CONSUL }}{{ .CONSUL }}{{ else }}consul{{ end }}",
                   "-retry-max", "10",
                   "-retry-interval", "10s"],
       "restarts": "unlimited"
+    }
+  ],
+  "backends": [
+    {
+      "name": "nats",
+      "poll": 3,
+      "onChange": "pkill -SIGHUP node"
     }
   ]
 }

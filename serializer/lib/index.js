@@ -102,11 +102,9 @@ function setupHapi () {
 }
 
 function writeHandler (request, reply) {
-  Items.serial(request.payload, (point, next) => {
-    writePoint(request.params.type, point.value, next);
-  }, () => {
-    reply({});
-  })
+  writePoint(request.params.type, request.payload.value, (err) => {
+    reply({ err });
+  });
 }
 
 function readHandler (request, reply) {

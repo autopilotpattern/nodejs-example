@@ -6,6 +6,8 @@
   "author": "",
   "license": "MPL-2.0",
   "dependencies": {
+    "nats": "0.7.x",
+    "piloted": "2.x.x",
     "seneca": "3.x.x"
   }
 }
