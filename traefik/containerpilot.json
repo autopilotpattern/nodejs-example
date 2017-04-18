@@ -2,8 +2,8 @@
   "consul": "localhost:8500",
   "services": [
     {
-      "name": "{{.SENSOR_TYPE}}",
-      "exec": "node /opt/app/",
+      "name": "traefik",
+      "exec": "traefik",
       "restarts": "unlimited"
     },
     {
@@ -17,18 +17,6 @@
                   "-retry-max", "10",
                   "-retry-interval", "10s"],
       "restarts": "unlimited"
-    }
-  ],
-  "backends": [
-    {
-      "name": "serializer",
-      "poll": 3,
-      "onChange": "pkill -SIGHUP node"
-    },
-    {
-      "name": "nats",
-      "poll": 3,
-      "onChange": "pkill -SIGHUP node"
     }
   ]
 }

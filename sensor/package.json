@@ -6,11 +6,8 @@
   "author": "",
   "license": "MPL-2.0",
   "dependencies": {
-    "brule": "2.x.x",
-    "hapi": "16.x.x",
-    "items": "2.x.x",
+    "nats": "0.7.x",
     "piloted": "2.x.x",
-    "seneca": "3.x.x",
     "wreck": "12.x.x"
   }
 }

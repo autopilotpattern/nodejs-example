@@ -24,6 +24,39 @@ prometheus:
       - consul:consul
     environment:
       - CONSUL=consul
+nats:
+    image: autopilotpattern/nats:0.9.6-r1.0.0
+    restart: always
+    ports:
+      - 8222
+    links:
+      - consul:consul
+    environment:
+      - CONSUL=consul
+      - CONSUL_AGENT=1
+      - NATS_USER=ruser
+      - NATS_PASSWORD=password
+natsboard:
+    image: d0cker/natsboard
+    restart: always
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    links:
+      - consul:consul
+    environment:
+      - CONSUL=consul
+      - CONSUL_AGENT=1
+traefik:
+    build: ./traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    links:
+      - consul:consul
+    environment:
+      - CONSUL=consul
+    restart: always
 influxdb:
   image: autopilotpattern/influxdb:1.1.1
   ports:
@@ -47,7 +80,7 @@ serializer:
     - consul:consul
   environment:
     - PORT=10000
-    - CONSUL_HOST=consul
+    - CONSUL=consul
     - INFLUXDB_USER=root
     - INFLUXDB_PWD=root123
   expose:
@@ -59,15 +92,11 @@ frontend:
   links:
     - consul:consul
   environment:
-    - CONSUL_HOST=consul
+    - CONSUL=consul
     - PORT=10001
-  ports:
-    - 10001:10001
   expose:
-    - 9090
+    - 10001
   restart: always
-  volumes:
-    - "./frontend/lib/public:/opt/app/lib/public"
 smartthings:
   build: ./smartthings
   links:
@@ -76,7 +105,10 @@ smartthings:
     - 8080
   environment:
     - PORT=8080
-    - CONSUL_HOST=consul
+    - CONSUL=consul
+    - NATS_USER=ruser
+    - NATS_PASSWORD=password
+    - FAKE_MODE=true
   restart: always
 humidity:
   build: ./sensor
@@ -84,7 +116,9 @@ humidity:
     - consul:consul
   environment:
     - SENSOR_TYPE=humidity
-    - CONSUL_HOST=consul
+    - CONSUL=consul
+    - NATS_USER=ruser
+    - NATS_PASSWORD=password
   restart: always
 motion:
   build: ./sensor
@@ -92,7 +126,9 @@ motion:
     - consul:consul
   environment:
     - SENSOR_TYPE=motion
-    - CONSUL_HOST=consul
+    - CONSUL=consul
+    - NATS_USER=ruser
+    - NATS_PASSWORD=password
   restart: always
 temperature:
   build: ./sensor
@@ -100,5 +136,7 @@ temperature:
     - consul:consul
   environment:
     - SENSOR_TYPE=temperature
-    - CONSUL_HOST=consul
+    - CONSUL=consul
+    - NATS_USER=ruser
+    - NATS_PASSWORD=password
   restart: always

@@ -1,0 +1,24 @@
+################################################################
+# Consul Catalog configuration backend
+################################################################
+
+# Enable Consul Catalog configuration backend
+#
+# Optional
+#
+[consulCatalog]
+
+# Consul server endpoint
+#
+# Required
+#
+endpoint = "localhost:8500"
+
+# Prefix for Consul catalog tags
+#
+# Optional
+#
+prefix = "traefik"
+
+[web]
+address = ":8080"

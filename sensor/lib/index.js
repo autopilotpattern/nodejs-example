@@ -2,41 +2,37 @@
 
 // Load modules
 
-const Items = require('items');
+const Nats = require('nats');
 const Piloted = require('piloted');
-const Seneca = require('seneca');
 const Wreck = require('wreck');
 
 
 const internals = {
   type: process.env.SENSOR_TYPE,
-  serializerFails: 0,
-  smartthingsFails: 0
+  serializerFails: 0
 };
 
+function setupNats() {
+  const servers = Piloted.serviceHosts('nats');
 
-function readData () {
-  if (!internals.smartthings) {
-    return readAgain();
+  if (!servers || !servers.length) {
+    console.error('NATS not found');
+    return setTimeout(() => { setupNats(); }, 1000);
   }
 
-  internals.smartthings.act({
-    role: 'smartthings',
-    cmd: 'read',
-    type: internals.type,
-    ago: 1
-  }, (err, data) => {
-    if (err) {
-      console.error(err);
-      return readAgain();
-    }
-
-    if (!data || !data.length) {
-      return readAgain();
-    }
-
-    writeData(data);
+  const natsServers = servers.map((server) => {
+    return `nats://${process.env.NATS_USER}:${process.env.NATS_PASSWORD}@${server.address}:4222`;
   });
+
+  const nats = Nats.connect({ servers: natsServers });
+  nats.on('error', (err) => {
+    console.log(err);
+  });
+
+  // Subscribe for messages related to the sensor type subject
+  // and create a queue group so that multiple instances don't
+  // handle the same message
+  nats.subscribe(internals.type, { queue: 'sensor' }, writeData);
 }
 
 function writeData (data) {
@@ -52,40 +48,15 @@ function writeData (data) {
     return setTimeout(() => { writeData(data); }, 1000);
   }
 
-  data = [].concat.apply([], data);
-  Wreck.post(`http://${serializer.address}:${serializer.port}/write/${internals.type}`, { payload: data }, readAgain);
-}
-
-function readAgain () {
-  setTimeout(readData, 2000);
-};
-
-function configureSmartthings() {
-  const smartthings = Piloted.serviceHosts('smartthings');
-  if (!smartthings && internals.smartthingsFails > 10) {
-    internals.smartthingsFails = 0;
-    Piloted.refresh();       // hit consul again and refresh our list
-  }
-
-  if (!smartthings) {
-    internals.smartthingsFails++;
-    console.error('Smartthings not found');
-    return setTimeout(() => { configureSmartthings(); }, 1000);
-  }
-
-  const randomIndex = Math.floor(Math.random() * smartthings.length);
-  const smartthingsServer = smartthings[randomIndex];
-  internals.smartthings = Seneca();
-  internals.smartthings.client({
-    host: smartthingsServer.address,
-    port: smartthingsServer.port
+  Wreck.post(`http://${serializer.address}:${serializer.port}/write/${internals.type}`, { payload: data }, (err) => {
+    if (err) {
+      console.error(err);
+    }
   });
-
-  readData();
 }
 
 Piloted.on('refresh', () => {
-  configureSmartthings();
+  setupNats();
 });
 
-configureSmartthings();
+setupNats();
