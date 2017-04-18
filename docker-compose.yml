@@ -52,6 +52,8 @@ influxdb:
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 traefik:
     image: d0cker/traefik:1.0.0
+    labels:
+      - triton.cns.services=ui
     ports:
       - "80:80"
       - "8080:8080"
@@ -59,7 +61,7 @@ traefik:
       - _env
     restart: always
 serializer:
-  image: d0cker/serializer:6.1.0
+  image: d0cker/serializer:6.2.0
   env_file:
     - _env
   environment:
@@ -69,14 +71,12 @@ serializer:
     - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:6.0.3
+  image: d0cker/frontend:6.0.4
   env_file:
     - _env
-  ports:
-    - "80:80"
+  expose:
+    - "80"
   restart: always
-  labels:
-    - triton.cns.services=frontend
 smartthings:
   image: d0cker/smartthings:8.0.0
   labels:
@@ -85,6 +85,8 @@ smartthings:
     - "80:80"
   env_file:
     - _env
+  environment:
+    - FAKE_MODE=true
   restart: always
 humidity:
   image: d0cker/sensor:4.0.0

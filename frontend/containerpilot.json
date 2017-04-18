@@ -10,7 +10,7 @@
       "tags": [
         "traefik.backend=frontend",
         "traefik.frontend.rule=Path: /,/lib/{[a-z]+},/js/{[a-z]+}",
-        "traefik.frontend.entryPoints=http"
+        "traefik.frontend.entryPoints=http,https,ws,wss"
       ]
     }
   ],
