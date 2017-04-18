@@ -21,6 +21,14 @@ nats:
     restart: always
     env_file:
       - _env
+natsboard:
+    image: d0cker/natsboard
+    restart: always
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    env_file:
+      - _env
 prometheus:
     image: autopilotpattern/prometheus:1.3.0r1.0
     mem_limit: 128m
@@ -42,6 +50,14 @@ influxdb:
     - INFLUXDB_DATA_QUERY_LOG_ENABLED=false
     - INFLUXDB_HTTP_LOG_ENABLED=false
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
+traefik:
+    image: d0cker/traefik:1.0.0
+    ports:
+      - "80:80"
+      - "8080:8080"
+    env_file:
+      - _env
+    restart: always
 serializer:
   image: d0cker/serializer:6.1.0
   env_file:
@@ -53,7 +69,7 @@ serializer:
     - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:6.0.2
+  image: d0cker/frontend:6.0.3
   env_file:
     - _env
   ports:
@@ -62,7 +78,7 @@ frontend:
   labels:
     - triton.cns.services=frontend
 smartthings:
-  image: d0cker/smartthings:7.0.0
+  image: d0cker/smartthings:8.0.0
   labels:
     - triton.cns.services=smartthings
   ports:
@@ -71,21 +87,21 @@ smartthings:
     - _env
   restart: always
 humidity:
-  image: d0cker/sensor:3.0.1
+  image: d0cker/sensor:4.0.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=humidity
   restart: always
 motion:
-  image: d0cker/sensor:3.0.1
+  image: d0cker/sensor:4.0.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=motion
   restart: always
 temperature:
-  image: d0cker/sensor:3.0.1
+  image: d0cker/sensor:4.0.0
   env_file:
     - _env
   environment:

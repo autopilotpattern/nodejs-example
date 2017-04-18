@@ -47,6 +47,16 @@ natsboard:
     environment:
       - CONSUL=consul
       - CONSUL_AGENT=1
+traefik:
+    build: ./traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    links:
+      - consul:consul
+    environment:
+      - CONSUL=consul
+    restart: always
 influxdb:
   image: autopilotpattern/influxdb:1.1.1
   ports:
@@ -84,13 +94,9 @@ frontend:
   environment:
     - CONSUL=consul
     - PORT=10001
-  ports:
-    - 10001:10001
   expose:
-    - 9090
+    - 10001
   restart: always
-  volumes:
-    - "./frontend/lib/public:/opt/app/lib/public"
 smartthings:
   build: ./smartthings
   links:

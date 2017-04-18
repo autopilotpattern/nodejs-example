@@ -6,7 +6,12 @@
       "port": {{.PORT}},
       "health": "/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/check-it-out",
       "poll": 3,
-      "ttl": 10
+      "ttl": 10,
+      "tags": [
+        "traefik.backend=frontend",
+        "traefik.frontend.rule=Path: /,/lib/{[a-z]+},/js/{[a-z]+}",
+        "traefik.frontend.entryPoints=http"
+      ]
     }
   ],
   "coprocesses": [
