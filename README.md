@@ -16,6 +16,11 @@ $ docker-compose -f local-compose.yml up -d
 
 Navigate to `http://localhost:10001` in your browser and you will see 3 charts. As data flows into the serializer from the various sensors you will start to see data appear on the charts in real-time.
 
+To check that all of the local containers are running you can execute the `ps` command by running
+```sh
+$ docker-compose -f local-compose.yml ps
+```
+
 ### Production
 
 When deploying to Triton, first setup your environment then run docker-compose. Below is an example of setting your environment variables then pushing the code to production.
