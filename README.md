@@ -29,6 +29,7 @@ When deploying to Triton, first setup your environment then run docker-compose. 
 $ ./setup.sh
 $ eval "$(triton env)"
 $ docker-compose up -d
+$ triton instance get nodejsexample_traefik_1
 ```
 
 
