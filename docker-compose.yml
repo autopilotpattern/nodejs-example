@@ -14,7 +14,6 @@ consul:
     /bin/consul agent -server
       -config-dir=/etc/consul
       -log-level=err
-      -bootstrap-expect 1
       -ui-dir /ui
 nats:
     image: autopilotpattern/nats:0.9.6-r1.0.0
