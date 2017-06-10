@@ -53,8 +53,18 @@ main();
 
 
 function setupHapi () {
-  const server = new Hapi.Server();
-  server.connection({ port: process.env.PORT });
+  const server = new Hapi.Server({
+    load: {
+      sampleInterval: 50
+    }
+  });
+
+  server.connection({
+    port: process.env.PORT,
+    load: {
+      maxEventLoopDelay: 20     // 20 milliseconds
+    }
+  });
 
   const goodOptions = {
     reporters: {

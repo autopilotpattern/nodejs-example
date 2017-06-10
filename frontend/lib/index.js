@@ -20,11 +20,19 @@ function main () {
           relativeTo: Path.join(__dirname, 'public')
         }
       }
+    },
+    load: {
+      sampleInterval: 100
     }
   };
 
   const server = new Hapi.Server(serverConfig);
-  server.connection({ port: process.env.PORT });
+  server.connection({
+    port: process.env.PORT,
+    load: {
+      maxEventLoopDelay: 30    // 30 milliseconds
+    }
+  });
   server.register([Inert, Brule], () => {
     server.route({
       method: 'GET',
