@@ -1,0 +1,61 @@
+{
+  consul: 'localhost:8500',
+  jobs: [
+    {
+      name: 'serializer',
+      port: {{.PORT}},
+      exec: 'node /opt/app/',
+      health: {
+        exec: '/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/check-it-out',
+        interval: 2,
+        ttl: 5
+      }
+    },
+    {
+      name: 'consul-agent',
+      exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/data',
+                  '-config-dir=/config',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ if .CONSUL }}{{ .CONSUL }}{{ else }}consul{{ end }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'],
+      restarts: 'unlimited'
+    },
+    {
+      name: 'onchange-influxdb',
+      exec: 'pkill -SIGHUP node',
+      when: {
+        source: 'watch.influxdb',
+        each: 'changed'
+      }
+    },
+    {
+      name: 'requests-sensor',
+      exec: '/bin/sensors/request_count.sh',
+      timeout: '5s',
+      when: {
+        interval: '5s'
+      }
+    }
+  ],
+  watches: [
+    {
+      name: 'influxdb',
+      interval: 3
+    }
+  ],
+  telemetry: {
+    port: 9090,
+    metrics: [
+      {
+        namespace: 'example',
+        subsystem: 'serializer',
+        name: 'requests_per_sec',
+        help: 'Number of requests/s',
+        type: 'gauge'
+      }
+    ]
+  }
+}
