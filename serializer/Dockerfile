@@ -13,8 +13,8 @@ RUN export CONSUL_VERSION=0.7.0 \
     && mkdir /config
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 3.0.0-dev.1
-RUN export CP_SHA1=bbeb4ed54d2e192fdd42d195fb3a0aa5726837b5 \
+ENV CONTAINERPILOT_VERSION 3.0.0-RC1
+RUN export CP_SHA1=f67929d1c8567d31772085fc252338091a5f795c \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
@@ -23,8 +23,8 @@ RUN export CP_SHA1=bbeb4ed54d2e192fdd42d195fb3a0aa5726837b5 \
 
 # COPY ContainerPilot configuration
 ENV CONTAINERPILOT_PATH=/etc/containerpilot.json
-COPY containerpilot.json ${CONTAINERPILOT_PATH}
-ENV CONTAINERPILOT=file://${CONTAINERPILOT_PATH}
+COPY containerpilot.json5 ${CONTAINERPILOT_PATH}
+ENV CONTAINERPILOT=${CONTAINERPILOT_PATH}
 
 RUN mkdir -p /bin/sensors
 COPY sensors/* /bin/sensors/
