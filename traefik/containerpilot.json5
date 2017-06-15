@@ -1,0 +1,28 @@
+{
+  consul: 'localhost:8500',
+  jobs: [
+    {
+      name: 'traefik',
+      exec: 'traefik',
+      port: 8080,
+      health: {
+        exec: '/usr/bin/curl -o /dev/null --fail -s http://localhost:8080/',
+        interval: 2,
+        ttl: 5
+      },
+      restarts: 'unlimited'
+    },
+    {
+      name: 'consul-agent',
+      exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/data',
+                  '-config-dir=/config',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ .CONSUL | default "consul" }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'],
+      restarts: 'unlimited'
+    }
+  ]
+}

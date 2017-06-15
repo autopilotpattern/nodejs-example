@@ -11,7 +11,7 @@
     "end-of-stream": "1.x.x",
     "hapi": "16.x.x",
     "inert": "4.x.x",
-    "piloted": "2.x.x",
+    "piloted": "3.x.x",
     "websocket-stream": "3.x.x",
     "wreck": "12.x.x"
   }

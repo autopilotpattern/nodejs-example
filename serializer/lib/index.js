@@ -55,14 +55,14 @@ main();
 function setupHapi () {
   const server = new Hapi.Server({
     load: {
-      sampleInterval: 50
+      sampleInterval: 100
     }
   });
 
   server.connection({
     port: process.env.PORT,
     load: {
-      maxEventLoopDelay: 20     // 20 milliseconds
+      maxEventLoopDelay: 50     // 50 milliseconds
     }
   });
 

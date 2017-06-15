@@ -1,0 +1,42 @@
+{
+  consul: 'localhost:8500',
+  jobs: [
+    {
+      name: 'smartthings',
+      port: {{.PORT}},
+      exec: 'node /opt/app/',
+      health: {
+        exec: '/opt/app/health.sh',
+        interval: 5,
+        ttl: 30
+      },
+      restarts: 'unlimited'
+    },
+    {
+      name: 'consul-agent',
+      exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/data',
+                  '-config-dir=/config',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ .CONSUL | default "consul" }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'],
+      restarts: 'unlimited'
+    },
+    {
+      name: 'onchange-nats',
+      exec: 'pkill -SIGHUP node',
+      when: {
+        source: 'watch.nats',
+        each: 'changed'
+      }
+    }
+  ],
+  watches: [
+    {
+      name: 'nats',
+      interval: 3
+    }
+  ]
+}

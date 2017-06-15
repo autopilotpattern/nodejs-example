@@ -1,0 +1,48 @@
+{
+  consul: 'localhost:8500',
+  jobs: [
+    {
+      name: '{{.SENSOR_TYPE}}',
+      exec: 'node /opt/app/',
+      restarts: 'unlimited'
+    },
+    {
+      name: 'consul-agent',
+      exec: ['/usr/local/bin/consul', 'agent',
+                  '-data-dir=/data',
+                  '-config-dir=/config',
+                  '-log-level=err',
+                  '-rejoin',
+                  '-retry-join', '{{ .CONSUL | default "consul" }}',
+                  '-retry-max', '10',
+                  '-retry-interval', '10s'],
+      restarts: 'unlimited'
+    },
+    {
+      name: 'onchange-serializer',
+      exec: 'pkill -SIGHUP node',
+      when: {
+        source: 'watch.serializer',
+        each: 'changed'
+      }
+    },
+    {
+      name: 'onchange-nats',
+      exec: 'pkill -SIGHUP node',
+      when: {
+        source: 'watch.nats',
+        each: 'changed'
+      }
+    }
+  ],
+  watches: [
+    {
+      name: 'serializer',
+      interval: 3
+    },
+    {
+      name: 'nats',
+      interval: 3
+    }
+  ]
+}

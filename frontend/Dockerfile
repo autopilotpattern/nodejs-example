@@ -13,8 +13,8 @@ RUN export CONSUL_VERSION=0.7.0 \
     && mkdir /config
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 2.7.2
-RUN export CP_SHA1=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
+ENV CONTAINERPILOT_VERSION 3.0.0
+RUN export CP_SHA1=6da4a4ab3dd92d8fd009cdb81a4d4002a90c8b7c \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
@@ -22,9 +22,9 @@ RUN export CP_SHA1=e886899467ced6d7c76027d58c7f7554c2fb2bcc \
     && rm /tmp/containerpilot.tar.gz
 
 # COPY ContainerPilot configuration
-ENV CONTAINERPILOT_PATH=/etc/containerpilot.json
-COPY containerpilot.json ${CONTAINERPILOT_PATH}
-ENV CONTAINERPILOT=file://${CONTAINERPILOT_PATH}
+ENV CONTAINERPILOT_PATH=/etc/containerpilot.json5
+COPY containerpilot.json5 ${CONTAINERPILOT_PATH}
+ENV CONTAINERPILOT=${CONTAINERPILOT_PATH}
 
 COPY memory.sh /bin/memory.sh
 RUN chmod 755 /bin/memory.sh
@@ -36,5 +36,4 @@ COPY lib/*.js /opt/app/lib/
 COPY lib/public /opt/app/lib/public
 RUN cd /opt/app && npm install
 
-ENTRYPOINT ["/bin/containerpilot", "node"]
-CMD ["/opt/app/"]
+CMD ["/bin/containerpilot"]
