@@ -15,8 +15,7 @@ consul:
       -bootstrap-expect 1
       -ui-dir /ui
 prometheus:
-    image: autopilotpattern/prometheus:1.3.0r1.0
-    mem_limit: 128m
+    image: d0cker/prom
     restart: always
     ports:
       - "9090:9090"
@@ -86,6 +85,8 @@ serializer:
   expose:
     - 10000
     - 9090
+  ports:
+    - 9090
   restart: always
 frontend:
   build: ./frontend
@@ -96,6 +97,7 @@ frontend:
     - PORT=10001
   expose:
     - 10001
+    - 9090
   restart: always
 smartthings:
   build: ./smartthings

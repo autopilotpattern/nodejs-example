@@ -2,14 +2,19 @@
   consul: 'localhost:8500',
   jobs: [
     {
-      name: 'serializer',
+      name: 'frontend',
       port: {{.PORT}},
       exec: 'node /opt/app/',
       health: {
         exec: '/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/check-it-out',
         interval: 2,
         ttl: 5
-      }
+      },
+      tags: [
+        'traefik.backend=frontend',
+        'traefik.frontend.rule=Path: /,/lib/{[a-z]+},/js/{[a-z]+}',
+        'traefik.frontend.entryPoints=http,https,ws,wss'
+      ]
     },
     {
       name: 'consul-agent',
@@ -24,16 +29,16 @@
       restarts: 'unlimited'
     },
     {
-      name: 'onchange-influxdb',
+      name: 'onchange-serializer',
       exec: 'pkill -SIGHUP node',
       when: {
-        source: 'watch.influxdb',
+        source: 'watch.serializer',
         each: 'changed'
       }
     },
     {
-      name: 'requests-sensor',
-      exec: '/bin/sensors/request_count.sh',
+      name: 'memory-sensor',
+      exec: '/bin/memory.sh',
       timeout: '5s',
       when: {
         interval: '5s'
@@ -43,7 +48,7 @@
   ],
   watches: [
     {
-      name: 'influxdb',
+      name: 'serializer',
       interval: 3
     }
   ],
@@ -53,9 +58,9 @@
     metrics: [
       {
         namespace: 'example',
-        subsystem: 'serializer',
-        name: 'requests',
-        help: 'Number of requests',
+        subsystem: 'frontend',
+        name: 'free_memory',
+        help: 'Amount of free memory',
         type: 'counter'
       }
     ]
