@@ -61,7 +61,7 @@
         subsystem: 'frontend',
         name: 'free_memory',
         help: 'Amount of free memory',
-        type: 'counter'
+        type: 'gauge'
       }
     ]
   }

@@ -55,8 +55,8 @@
         namespace: 'example',
         subsystem: 'serializer',
         name: 'requests',
-        help: 'Number of requests',
-        type: 'counter'
+        help: 'Number of requests/5s',
+        type: 'gauge'
       }
     ]
   }

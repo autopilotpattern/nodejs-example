@@ -15,7 +15,7 @@ consul:
       -bootstrap-expect 1
       -ui-dir /ui
 prometheus:
-    image: d0cker/prom
+    image: autopilotpattern/prometheus:1.7.1-r20
     restart: always
     ports:
       - "9090:9090"
@@ -23,6 +23,9 @@ prometheus:
       - consul:consul
     environment:
       - CONSUL=consul
+      - CONSUL_AGENT=1
+    dns:
+      - 127.0.0.1
 nats:
     image: autopilotpattern/nats:0.9.6-r1.0.0
     restart: always

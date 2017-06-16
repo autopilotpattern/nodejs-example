@@ -29,7 +29,7 @@ natsboard:
     env_file:
       - _env
 prometheus:
-    image: autopilotpattern/prometheus:1.3.0r1.0
+    image: autopilotpattern/prometheus:1.7.1-r20
     mem_limit: 128m
     restart: always
     ports:
