@@ -57,6 +57,13 @@
         name: 'requests',
         help: 'Number of requests/5s',
         type: 'gauge'
+      },
+      {
+        namespace: 'example',
+        subsystem: 'process',
+        name: 'event_delay',
+        help: 'Node.js event loop delay',
+        type: 'gauge'
       }
     ]
   }
