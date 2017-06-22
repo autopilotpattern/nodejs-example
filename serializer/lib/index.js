@@ -7,6 +7,7 @@ const Hapi = require('hapi');
 const Influx = require('influx');
 const Items = require('items');
 const Piloted = require('piloted');
+const Toppsy = require('toppsy');
 
 
 const internals = {
@@ -82,7 +83,12 @@ function setupHapi () {
     }
   };
 
-  server.register([Brule, { register: Good, options: goodOptions }], (err) => {
+
+  server.register([
+      Brule,
+      { register: Good, options: goodOptions },
+      { register: Toppsy, options: { namespace: 'example' } }
+    ], (err) => {
     if (err) {
       console.error(err);
       process.exit(1);
