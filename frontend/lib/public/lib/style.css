@@ -1,0 +1,12 @@
+body {
+  padding-left: 20px
+}
+
+h2 {
+  color: #555555;
+  font-size: 28px;
+  font-weight: normal;
+  float: none;
+  text-shadow: 0 1px 0 #ffffff;
+  position: relative;
+}

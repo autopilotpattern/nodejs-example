@@ -8,11 +8,10 @@ var initChart = function(type) {
     element: document.getElementById(type),
     width: 700,
     height: 300,
-    renderer: 'line',
     stroke: true,
     series: [{
       data: [],
-      color: '#6060c0',
+      color: 'steelblue',
       name: type
     }]
   });
