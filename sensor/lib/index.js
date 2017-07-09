@@ -8,8 +8,7 @@ const Wreck = require('wreck');
 
 
 const internals = {
-  type: process.env.SENSOR_TYPE,
-  serializerFails: 0
+  type: process.env.SENSOR_TYPE
 };
 
 function setupNats() {
@@ -37,13 +36,8 @@ function setupNats() {
 
 function writeData (data) {
   const serializer = Piloted.service('serializer');
-  if (!serializer && internals.serializerFails > 10) {
-    internals.serializerFails = 0;
-    Piloted.refresh();       // hit consul again and refresh our list
-  }
 
   if (!serializer) {
-    internals.serializerFails++;
     console.error('Serializer not found');
     return setTimeout(() => { writeData(data); }, 1000);
   }

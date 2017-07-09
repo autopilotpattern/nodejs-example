@@ -1,5 +1,5 @@
 consul:
-  image: autopilotpattern/consul:0.7.2-r0.8
+  image: autopilotpattern/consul:0.7.3r39
   restart: always
   dns:
     - 127.0.0.1
@@ -9,11 +9,8 @@ consul:
     - "8500:8500"
   command: >
     /usr/local/bin/containerpilot
-    /bin/consul agent -server
-      -config-dir=/etc/consul
-      -log-level=err
-      -bootstrap-expect 1
-      -ui-dir /ui
+  environment:
+    - CONSUL_DEV=1
 prometheus:
     image: autopilotpattern/prometheus:1.7.1-r20
     restart: always
@@ -87,8 +84,6 @@ serializer:
     - INFLUXDB_PWD=root123
   expose:
     - 10000
-    - 9090
-  ports:
     - 9090
   restart: always
 frontend:
