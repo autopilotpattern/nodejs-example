@@ -6,9 +6,9 @@
       port: {{.PORT}},
       exec: 'node /opt/app/',
       health: {
-        exec: '/usr/bin/curl -o /dev/null --fail -s http://localhost:{{.PORT}}/check-it-out',
-        interval: 2,
-        ttl: 5
+        exec: '/usr/bin/curl -o /dev/null --fail -s http://127.0.0.1:{{.PORT}}/check-it-out',
+        interval: 1,
+        ttl: 2
       }
     },
     {
@@ -44,7 +44,7 @@
   watches: [
     {
       name: 'influxdb',
-      interval: 3
+      interval: 2
     }
   ],
   telemetry: {

@@ -63,7 +63,7 @@ function setupHapi () {
   server.connection({
     port: process.env.PORT,
     load: {
-      maxEventLoopDelay: 50     // 50 milliseconds
+      maxEventLoopDelay: 100     // 50 milliseconds
     }
   });
 

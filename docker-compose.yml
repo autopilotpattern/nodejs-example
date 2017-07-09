@@ -1,5 +1,5 @@
 consul:
-  image: autopilotpattern/consul:0.7.2-r0.8
+  image: autopilotpattern/consul:0.7.3r39
   restart: always
   dns:
     - 127.0.0.1
@@ -11,10 +11,6 @@ consul:
     - _env
   command: >
     /usr/local/bin/containerpilot
-    /bin/consul agent -server
-      -config-dir=/etc/consul
-      -log-level=err
-      -ui-dir /ui
 nats:
     image: autopilotpattern/nats:0.9.6-r1.0.0
     restart: always
@@ -50,7 +46,7 @@ influxdb:
     - INFLUXDB_HTTP_LOG_ENABLED=false
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 traefik:
-    image: d0cker/traefik:1.0.0
+    image: d0cker/traefik:1.1.0
     labels:
       - triton.cns.services=ui
     ports:
@@ -60,7 +56,7 @@ traefik:
       - _env
     restart: always
 serializer:
-  image: d0cker/serializer:6.2.0
+  image: d0cker/serializer:6.3.0
   env_file:
     - _env
   environment:
@@ -70,14 +66,14 @@ serializer:
     - "80"
   restart: always
 frontend:
-  image: d0cker/frontend:6.0.4
+  image: d0cker/frontend:6.1.0
   env_file:
     - _env
   expose:
     - "80"
   restart: always
 smartthings:
-  image: d0cker/smartthings:8.0.0
+  image: d0cker/smartthings:8.1.0
   labels:
     - triton.cns.services=smartthings
   ports:
@@ -88,21 +84,21 @@ smartthings:
     - FAKE_MODE=true
   restart: always
 humidity:
-  image: d0cker/sensor:4.0.0
+  image: d0cker/sensor:4.1.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=humidity
   restart: always
 motion:
-  image: d0cker/sensor:4.0.0
+  image: d0cker/sensor:4.1.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=motion
   restart: always
 temperature:
-  image: d0cker/sensor:4.0.0
+  image: d0cker/sensor:4.1.0
   env_file:
     - _env
   environment:

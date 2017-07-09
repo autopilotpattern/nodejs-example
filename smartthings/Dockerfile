@@ -1,4 +1,4 @@
-FROM node:6-alpine
+FROM node:8-alpine
 
 RUN apk update && \
     apk add curl && \
@@ -13,8 +13,8 @@ RUN export CONSUL_VERSION=0.7.0 \
     && mkdir /config
 
 # Install ContainerPilot
-ENV CONTAINERPILOT_VERSION 3.0.0
-RUN export CP_SHA1=6da4a4ab3dd92d8fd009cdb81a4d4002a90c8b7c \
+ENV CONTAINERPILOT_VERSION 3.1.3
+RUN export CP_SHA1=0526af66371e1e54c840bcfbf42c4ded4124e026 \
     && curl -Lso /tmp/containerpilot.tar.gz \
          "https://github.com/joyent/containerpilot/releases/download/${CONTAINERPILOT_VERSION}/containerpilot-${CONTAINERPILOT_VERSION}.tar.gz" \
     && echo "${CP_SHA1}  /tmp/containerpilot.tar.gz" | sha1sum -c \
