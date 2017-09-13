@@ -1,19 +1,27 @@
 consul:
-  image: autopilotpattern/consul:0.7.3r39
+  image: autopilotpattern/consul:0.7.2-r0.8
+  command: >
+    /usr/local/bin/containerpilot
+    /bin/consul agent -server
+      -config-dir=/etc/consul
+      -log-level=err
+      -bootstrap-expect 1
+      -ui-dir /ui
   restart: always
-  dns:
-    - 127.0.0.1
   labels:
     - triton.cns.services=consul
   ports:
     - "8500:8500"
   env_file:
     - _env
-  command: >
-    /usr/local/bin/containerpilot
 nats:
-    image: autopilotpattern/nats:0.9.6-r1.0.0
+    image: autopilotpattern/nats:1.0.2-r5
     restart: always
+    expose:
+      - "9090"
+      - "4222"
+      - "8222"
+      - "6222"
     env_file:
       - _env
 natsboard:
@@ -25,7 +33,7 @@ natsboard:
     env_file:
       - _env
 prometheus:
-    image: autopilotpattern/prometheus:1.7.1-r20
+    image: autopilotpattern/prometheus:1.7.1-r24
     mem_limit: 128m
     restart: always
     ports:
@@ -46,17 +54,19 @@ influxdb:
     - INFLUXDB_HTTP_LOG_ENABLED=false
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 traefik:
-    image: d0cker/traefik:1.1.0
+    image: d0cker/traefik:1.2.0
     labels:
       - triton.cns.services=ui
     ports:
       - "80:80"
       - "8080:8080"
+    expose:
+      - "9090"
     env_file:
       - _env
     restart: always
 serializer:
-  image: d0cker/serializer:6.3.0
+  image: d0cker/serializer:6.4.0
   env_file:
     - _env
   environment:
@@ -64,43 +74,53 @@ serializer:
     - INFLUXDB_PWD=root123
   expose:
     - "80"
+    - "9090"
   restart: always
 frontend:
-  image: d0cker/frontend:6.1.0
+  image: d0cker/frontend:6.2.0
   env_file:
     - _env
   expose:
     - "80"
+    - "9090"
   restart: always
 smartthings:
-  image: d0cker/smartthings:8.1.0
+  image: d0cker/smartthings:8.2.0
   labels:
     - triton.cns.services=smartthings
   ports:
-    - "80:80"
+    - "80"
+  expose:
+    - "9090"
   env_file:
     - _env
   environment:
     - FAKE_MODE=true
   restart: always
 humidity:
-  image: d0cker/sensor:4.1.0
+  image: d0cker/sensor:4.2.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=humidity
+  expose:
+    - "9090"
   restart: always
 motion:
-  image: d0cker/sensor:4.1.0
+  image: d0cker/sensor:4.2.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=motion
+  expose:
+    - "9090"
   restart: always
 temperature:
-  image: d0cker/sensor:4.1.0
+  image: d0cker/sensor:4.2.0
   env_file:
     - _env
   environment:
     - SENSOR_TYPE=temperature
+  expose:
+    - "9090"
   restart: always
