@@ -89,7 +89,7 @@ smartthings:
   labels:
     - triton.cns.services=smartthings
   ports:
-    - "80:80"
+    - "80"
   expose:
     - "9090"
   env_file:
