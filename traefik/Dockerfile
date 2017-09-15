@@ -1,4 +1,4 @@
-FROM traefik:1.3-alpine
+FROM traefik:1.4-alpine
 
 RUN apk update && \
     apk add curl unzip tar && \
