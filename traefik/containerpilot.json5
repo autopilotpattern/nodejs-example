@@ -26,7 +26,6 @@
     }
   ],
   telemetry: {
-    port: 9090,
-    interfaces: ['eth1', 'eth0', 'eth0[1]', 'lo', 'lo0', 'inet']
+    port: 9090
   }
 }
