@@ -55,6 +55,7 @@
   telemetry: {
     port: 9090,
     tags: ['op'],
+    interfaces: ['eth1', 'eth0', 'eth0[1]', 'lo', 'lo0', 'inet'],
     metrics: [
       {
         namespace: 'example',

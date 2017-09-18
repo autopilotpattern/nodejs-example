@@ -12,6 +12,8 @@ consul:
     - triton.cns.services=consul
   ports:
     - "8500:8500"
+  expose:
+    - 9090
   env_file:
     - _env
 nats:
@@ -25,11 +27,13 @@ nats:
     env_file:
       - _env
 natsboard:
-    image: d0cker/natsboard
+    image: d0cker/natsboard:1.0.0
     restart: always
     ports:
       - "3000:3000"
       - "3001:3001"
+    expose:
+      - "9090"
     env_file:
       - _env
 prometheus:
@@ -43,6 +47,10 @@ prometheus:
 influxdb:
   image: autopilotpattern/influxdb:1.1.1
   restart: always
+  expose:
+      - "9090"
+      - "8086"
+      - "8083"
   env_file:
     - _env
   environment:
@@ -77,7 +85,7 @@ serializer:
     - "9090"
   restart: always
 frontend:
-  image: d0cker/frontend:6.2.0
+  image: d0cker/frontend:6.2.1
   env_file:
     - _env
   expose:
@@ -98,7 +106,7 @@ smartthings:
     - FAKE_MODE=true
   restart: always
 humidity:
-  image: d0cker/sensor:4.2.0
+  image: d0cker/sensor:4.3.0
   env_file:
     - _env
   environment:
@@ -107,7 +115,7 @@ humidity:
     - "9090"
   restart: always
 motion:
-  image: d0cker/sensor:4.2.0
+  image: d0cker/sensor:4.3.0
   env_file:
     - _env
   environment:
@@ -116,7 +124,7 @@ motion:
     - "9090"
   restart: always
 temperature:
-  image: d0cker/sensor:4.2.0
+  image: d0cker/sensor:4.3.0
   env_file:
     - _env
   environment:
