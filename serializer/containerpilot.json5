@@ -9,7 +9,8 @@
         exec: '/usr/bin/curl -o /dev/null --fail -s http://127.0.0.1:{{.PORT}}/check-it-out',
         interval: 1,
         ttl: 2
-      }
+      },
+      restarts: 'unlimited'
     },
     {
       name: 'consul-agent',

@@ -4,7 +4,12 @@
     {
       name: '{{.SENSOR_TYPE}}',
       exec: 'node /opt/app/',
-      restarts: 'unlimited'
+      restarts: 'unlimited',
+      health: {
+        exec: 'pgrep node',
+        interval: 10,
+        ttl: 20
+      }
     },
     {
       name: 'consul-agent',
