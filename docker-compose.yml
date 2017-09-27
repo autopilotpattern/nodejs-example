@@ -62,7 +62,7 @@ influxdb:
     - INFLUXDB_HTTP_LOG_ENABLED=false
     - INFLUXDB_CONTINUOUS_QUERIES_LOG_ENABLED=false
 traefik:
-    image: d0cker/traefik:1.3.1
+    image: d0cker/traefik:1.3.2
     labels:
       - triton.cns.services=ui
     ports:
@@ -93,7 +93,7 @@ frontend:
     - "9090"
   restart: always
 smartthings:
-  image: d0cker/smartthings:8.2.0
+  image: d0cker/smartthings:8.2.1
   labels:
     - triton.cns.services=smartthings
   ports:
@@ -106,7 +106,7 @@ smartthings:
     - FAKE_MODE=true
   restart: always
 humidity:
-  image: d0cker/sensor:4.3.0
+  image: d0cker/sensor:4.3.1
   env_file:
     - _env
   environment:
@@ -115,7 +115,7 @@ humidity:
     - "9090"
   restart: always
 motion:
-  image: d0cker/sensor:4.3.0
+  image: d0cker/sensor:4.3.1
   env_file:
     - _env
   environment:
@@ -124,7 +124,7 @@ motion:
     - "9090"
   restart: always
 temperature:
-  image: d0cker/sensor:4.3.0
+  image: d0cker/sensor:4.3.1
   env_file:
     - _env
   environment:
