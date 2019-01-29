@@ -10,14 +10,21 @@ Example microservices implementation using Node.js and Docker. Below is an archi
 
 In local development you can start the microservices by running
 
-```sh
+```console
 $ docker-compose -f local-compose.yml up -d
 ```
 
-Navigate to `http://localhost:10001` in your browser and you will see 3 charts. As data flows into the serializer from the various sensors you will start to see data appear on the charts in real-time.
+Then scale up the frontend by a number of instances (3 in this case):
+
+```console
+$ docker-compose -f local-compose.yml scale frontend=3
+```
+
+Navigate to `http://localhost` in your browser and you will see 3 charts. As data flows into the serializer from the various sensors you will start to see data appear on the charts in real-time.
 
 To check that all of the local containers are running you can execute the `ps` command by running
-```sh
+
+```console
 $ docker-compose -f local-compose.yml ps
 ```
 
@@ -25,7 +32,7 @@ $ docker-compose -f local-compose.yml ps
 
 When deploying to Triton, first setup your environment then run docker-compose. Below is an example of setting your environment variables then pushing the code to production.
 
-```sh
+```console
 $ ./setup.sh
 $ eval "$(triton env)"
 $ docker-compose up -d
